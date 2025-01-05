@@ -32,7 +32,7 @@ version of pytorch and pytorch3d should be changed if you need other CUDA versio
 
 ## Checkpoints
 
-Please download checkpoints [here](https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/checkpoints) to the folder [checkpoints](https://github.com/facebookresearch/facebookresearch/mvdust3r/checkpoints) before trying demo and evaluation.
+Please download checkpoints [here](https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/checkpoints) to the folder [checkpoints](https://github.com/facebookresearch/facebookresearch/mvdust3r/tree/main/checkpoints) before trying demo and evaluation.
 
 Here we have the following checkpoints: `MVD.pth`(MV-DUSt3R), `MVDp_s1.pth`(MV-DUSt3R+, stage 1) `MVDp_s2.pth`(MV-DUSt3R+, stage 2)
 `DUSt3R_ViTLarge_BaseDecoder_224_linear.pth` (the pretrained DUSt3R model. Our training is finetuned upon it)
@@ -45,17 +45,17 @@ python demo.py --weights ./checkpoints/{CHECKPOINT}
 
 ## Data
 
-We use five data for training and test: ScanNet, ScanNet++, HM3D, Gibson, MP3D. Please go to their website to sign contract, download and extract them in the folder [data](https://github.com/facebookresearch/facebookresearch/mvdust3r/data).
+We use five data for training and test: ScanNet, ScanNet++, HM3D, Gibson, MP3D. Please go to their website to sign contract, download and extract them in the folder [data](https://github.com/facebookresearch/facebookresearch/mvdust3r/tree/main/data).
 
-Currently we released the [trajectories](https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/trajectories) of ScanNet for evaluation. Please download it to the folder [trajectories](https://github.com/facebookresearch/facebookresearch/mvdust3r/trajectories) More trajectories for training and more data will be released later.
+Currently we released the [trajectories](https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/trajectories) of ScanNet for evaluation. Please download it to the folder [trajectories](https://github.com/facebookresearch/facebookresearch/mvdust3r/tree/main/trajectories) More trajectories for training and more data will be released later.
 
 ## Evaluation
 
-Here we have the following scripts for evaluation on ScanNet in the folder [scripts](https://github.com/facebookresearch/facebookresearch/mvdust3r/scripts): `test_mvd.sh` `test_mvdp_stage1.sh` `test_mvdp_stage2.sh`.They should reproduce the paper's result on ScanNet.
+Here we have the following scripts for evaluation on ScanNet in the folder [scripts](https://github.com/facebookresearch/facebookresearch/mvdust3r/tree/main/scripts): `test_mvd.sh` `test_mvdp_stage1.sh` `test_mvdp_stage2.sh`.They should reproduce the paper's result on ScanNet.
 
 ## Training
 
-We are still preparing for the releasing of trajectories of training data and code of trajectory generation. Here we also put training scripts in the folder [scripts](https://github.com/facebookresearch/facebookresearch/mvdust3r/scripts), which can provide more information about our training.
+We are still preparing for the releasing of trajectories of training data and code of trajectory generation. Here we also put training scripts in the folder [scripts](https://github.com/facebookresearch/facebookresearch/mvdust3r/tree/main/scripts), which can provide more information about our training.
 
 ## Citation
 
