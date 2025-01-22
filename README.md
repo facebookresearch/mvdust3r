@@ -111,6 +111,8 @@ We are still preparing for the releasing of trajectories of training data and co
 | train_mvdp_stage1.sh | MV-DUSt3R+ training on stage 1 (8 views), loaded from DUSt3R to finetune |
 | train_mvdp_stage2.sh | MV-DUSt3R+ trained on stage 1 finetuning on stage 2 (mixed 4~12 views) |
 
+See [here](https://github.com/facebookresearch/mvdust3r/tree/main/scripts) for more hyperparameter explanations.
+
 ## Citation
 
 ```bibtex
