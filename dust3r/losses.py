@@ -1113,12 +1113,13 @@ class GSRenderLoss (Criterion, MultiLoss):
         for c2w in c2ws:
             # print('c2w shape', c2w.shape, gt_norm_factor.shape) # [4,4,4]
             c2w[:,:3,3:] = c2w[:,:3,3:] / gt_norm_factor
-        while gt_norm_factor.ndim < pred1['scale'].ndim: # -> (B, 1, 1)
-            gt_norm_factor.unsqueeze_(-1)
-            pr_norm_factor.unsqueeze_(-1)
-        for pred in [pred1] + pred2s:
-            if self.scale_scaled:
-                pred['scale'][:] = pred['scale'][:] / pr_norm_factor
+        if 'scale' in pred1.keys():
+            while gt_norm_factor.ndim < pred1['scale'].ndim: # -> (B, 1, 1)
+                gt_norm_factor.unsqueeze_(-1)
+                pr_norm_factor.unsqueeze_(-1)
+            for pred in [pred1] + pred2s:
+                if self.scale_scaled:
+                    pred['scale'][:] = pred['scale'][:] / pr_norm_factor
         extra_info = {'monitering': {}}
         if log:
             with torch.no_grad():
