@@ -464,18 +464,18 @@ class AsymmetricCroCo3DStereoMultiView (
         n_ref = view2s_all[0].get("n_ref", torch.Tensor([1]).long())[0].item()
         if self.n_ref is not None:
             n_ref = self.n_ref
-        assert self.m_ref_flag == False and n_ref == 1 or self.m_ref_flag == True and n_ref > 1, f"No. of reference views should be > 1 if m_ref_flag is True"
+        assert self.m_ref_flag == False or (self.m_ref_flag == True and n_ref > 1), f"No. of reference views should be > 1 if m_ref_flag is True"
 
         if num_render_views:
             view2s, view2s_render = view2s_all[:-num_render_views], view2s_all[-num_render_views:]
         else:
             view2s, view2s_render = view2s_all, []
-
+        
         (shape1, shape2s), (feat1, feat2s), (pos1, pos2s) = self._encode_symmetrized(view1, view2s) # every view is dealt with the same param.
-
+        
         # combine all ref images into object-centric representation
         dec1, dec2s = self._decoder(feat1, pos1, feat2s, pos2s, n_ref = n_ref)
-
+        
         with torch.cuda.amp.autocast(enabled=False):
             # print('1 shape', [tok.shape for tok in dec1]) # 1 shape [torch.Size([4, 14 * 14, 1024]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768])]
             # print('2 shape', [[tok.shape for tok in dec2] for (dec2, shape2) in zip(dec2s, shape2s)]) # 2 shape [[torch.Size([4, 196, 1024]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768])], [torch.Size([4, 196, 1024]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768])], [torch.Size([4, 196, 1024]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768]), torch.Size([4, 196, 768])]]
@@ -504,4 +504,5 @@ class AsymmetricCroCo3DStereoMultiView (
 
             for res2 in res2s:
                 res2['pts3d_in_other_view'] = res2.pop('pts3d')  # predict view2's pts3d in view1's frame
+        
         return res1, res2s

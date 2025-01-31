@@ -18,6 +18,7 @@ Please see more visual results and video on our [website](https://mv-dust3rp.git
 
 ## Update Logs
 
+- 2025-1-30: data generation code of ScanNet.
 - 2025-1-1: A gradio demo, all checkpoints, training/evaluation code and training/evaluation trajectories of ScanNet.
 - 2025-1-8: demo view selection improved, better quality for multiple rooms.
 
@@ -110,8 +111,6 @@ We are still preparing for the releasing of trajectories of training data and co
 | train_mvd.sh | MV-DUSt3R, loaded from DUSt3R to finetune |
 | train_mvdp_stage1.sh | MV-DUSt3R+ training on stage 1 (8 views), loaded from DUSt3R to finetune |
 | train_mvdp_stage2.sh | MV-DUSt3R+ trained on stage 1 finetuning on stage 2 (mixed 4~12 views) |
-
-See [here](https://github.com/facebookresearch/mvdust3r/tree/main/scripts) for more hyperparameter explanations.
 
 ## Citation
 

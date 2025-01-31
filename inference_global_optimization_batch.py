@@ -20,15 +20,16 @@ import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 torch.backends.cuda.matmul.allow_tf32 = True  # for gpu >= Ampere and pytorch >= 1.12
-import torch.manifold.patch
 
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
-from iopath.common.file_io import g_pathmgr
-from datasets_preprocess.html_gen.run_model_doctor import generate_html
-from on_device_ai.cvg.pipix.mini.distributed import get_local_path, set_device
-from on_device_ai.cvg.pipix.mini.logging import get_log_dir
+if 'META_INTERNAL' in os.environ.keys() and os.environ['META_INTERNAL'] == "False":
+    generate_html = None
+    from dust3r.dummy_io import *
+else:
+    from meta_internal.io import *
+    from meta_internal.html_gen.run_model_doctor import generate_html
 
 from dust3r.model import AsymmetricCroCo3DStereo, AsymmetricCroCo3DStereoMultiView, inf 
 import dust3r.utils.path_to_croco  # noqa: F401
@@ -105,11 +106,8 @@ def main(args):
     print('world size', world_size, 'global_rank', global_rank, 'real_batch_size', real_batch_size)
     set_device(args.gpu)
 
-    args.output_dir = get_log_dir(
-        manifold_bucket="ondevice_ai_writedata",
-        manifold_dir="zgtang/dust3r/logs",
-        resume_from=args.output_dir,
-    )
+    args.output_dir = get_log_dir_warp(args.output_dir)
+
     print("output_dir: "+args.output_dir) # manifold://ondevice_ai_writedata/tree/zgtang/dust3r/logs/torchx-dust3r_train-temp3
     if args.output_dir:
         g_pathmgr.mkdirs(args.output_dir)
@@ -165,7 +163,7 @@ def main(args):
         print('Loading pretrained: ', args.pretrained, model_name) # 
 
         state_dict_loaded = model_loaded.state_dict()
-        model.load_state_dict(state_dict_loaded, strict=True)
+        model.load_state_dict(state_dict_loaded, strict=False)
         model_without_ddp = model
 
     eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
@@ -244,7 +242,6 @@ def build_dataset(dataset, batch_size, num_workers, test=False):
     print(f"{split} dataset length: ", len(loader))
     return loader
 
-
 def save_results(loss_and_others, batch, name_list, args):
     all_info = loss_and_others
     other_info = loss_and_others['loss'][1]
@@ -264,10 +261,14 @@ def save_results(loss_and_others, batch, name_list, args):
             label = batch[0]['label'][img_id // n_ref]
             name = "_".join(name_list[0:1] + [label] + name_list[1:])
             rgb1 = all_info['view1']['img'][img_id].permute(1,2,0)
+            valid_mask1 = all_info['view1']['valid_mask'][img_id].reshape(-1)
             num_render_views = all_info['view2s'][0].get("num_render_views", torch.zeros([0]).long())[0].item()
             rgb2s_all = [x['img'][img_id].permute(1,2,0) for x in all_info['view2s']]
+            valid_mask2s = [x['valid_mask'][img_id].reshape(-1) for x in all_info['view2s']]
             rgb2s = rgb2s_all[:-num_render_views] if num_render_views else rgb2s_all
+            valid_mask2s = valid_mask2s[:-num_render_views] if num_render_views else valid_mask2s
             rgb      = torch.cat([rgb1.reshape(-1, 3)] + [rgb2.reshape(-1, 3) for rgb2 in rgb2s], 0)
+            valid_masks = torch.stack([valid_mask1] + valid_mask2s, 0)
             pts3d_gt = torch.cat([all_info['view1']['pts3d'][img_id].reshape(-1, 3)] + [x['pts3d'][img_id].reshape(-1, 3) for x in (all_info['view2s'][:-num_render_views] if num_render_views else all_info['view2s'])], 0)
             pts3d    = torch.cat([all_info['pred1']['pts3d'][img_id_mref_first].reshape(-1, 3)] + [x['pts3d_in_other_view'][img_id_mref_first].reshape(-1, 3) for x in all_info['pred2s']], 0)
             conf = torch.cat([all_info['pred1']['conf'][img_id_mref_first].reshape(-1, 1)] + [x['conf'][img_id_mref_first].reshape(-1, 1) for x in all_info['pred2s']], 0)
@@ -283,7 +284,7 @@ def save_results(loss_and_others, batch, name_list, args):
             video_pcd_gt =      pcd_render(pts3d_gt, rgb, tgt = None, normalize = True)
             video_pcd =         pcd_render(pts3d   , rgb, tgt = None, normalize = True)
             # video_pcd_conf = video_pcd
-            video_pcd_conf =    pcd_render(pts3d   , rgb, tgt = None, normalize = True, mask = conf > conf_thres) # log(3)
+            video_pcd_conf =    pcd_render(pts3d   , rgb, tgt = None, normalize = True, mask = conf > conf_thres * valid_masks.reshape(-1, 1)) # log(3)
             # print('vis conf range', conf.min(), conf.mean(), conf.max(), conf_thres, (conf < 1.02).float().mean(), (conf < 1.03).float().mean(), (conf < 1.06).float().mean(), (conf < 1.09).float().mean())
             save_video_combined([video_pcd, video_pcd_conf, video_pcd_gt], f"{args.output_dir}/videos/{name}_{img_id_name}_and_gt.mp4")
             if 'scale' in all_info['pred1'].keys(): # 3DGS predicted
@@ -431,7 +432,8 @@ def test_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     t_log = - time.time()
     
     if data_loader.dataset.save_results:
-        generate_html(args.output_dir + '/videos', args.output_dir + '/html')
+        if generate_html is not None:
+            generate_html(args.output_dir + '/videos', args.output_dir + '/html')
 
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)

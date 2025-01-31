@@ -194,7 +194,11 @@ class MVDataset(BaseStereoViewDataset):
                     elif 'mp3d' in rgb_list[i]:
                         scene_name = rgb_list[i].split('/')[-2]
                     else:
-                        scene_name = rgb_list[i].split('/')[-4]
+                        scene_name = rgb_list[i].split('/')
+                        for x in scene_name:
+                            if "scene" in x:
+                                scene_name = x
+                                break
                 label=f"dataName_{self.tb_name}_id_{str(idx).zfill(9)}_sceneName_{scene_name}_refId_{str(ref_view_id).zfill(3)}"
             else:
                 label=f"{str(idx).zfill(9)}"

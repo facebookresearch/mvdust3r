@@ -196,6 +196,7 @@ def get_reconstructed_scene(outdir, model, device, silent, image_size, filelist,
         imgs[3], imgs[change_id] = deepcopy(imgs[change_id]), deepcopy(imgs[3])
     
     output = inference_mv(imgs, model, device, verbose=not silent)
+    input('press enter to continue')
 
     # print(output['pred1']['rgb'].shape, imgs[0]['img'].shape, 'aha')
     output['pred1']['rgb'] = imgs[0]['img'].permute(0,2,3,1)
@@ -245,11 +246,10 @@ def set_scenegraph_options(inputfiles, winsize, refid, scenegraph_type):
                               maximum=num_files-1, step=1, visible=False)
     return winsize, refid
 
-
 def main_demo(tmpdirname, model, device, image_size, server_name, server_port, silent=False):
     recon_fun = functools.partial(get_reconstructed_scene, tmpdirname, model, device, silent, image_size)
     model_from_scene_fun = functools.partial(get_3D_model_from_scene, tmpdirname, silent, only_model = True)
-    with gradio.Blocks(css=""".gradio-container {margin: 0 !important; min-width: 100%};""", title="MV-DUSt3R+ Demo") as demo:
+    with gradio.Blocks(css=""".gradio-container {margin: 0 !important; min-width: 100%};""", title="MV-DUSt3R+ Demo", theme="default") as demo:
         # scene state is save so that you can change conf_thr, cam_size... without rerunning the inference
         scene = gradio.State(None)
         gradio.HTML('<h2 style="text-align: center;">MV-DUSt3R+ Demo</h2>')
@@ -290,7 +290,7 @@ def main_demo(tmpdirname, model, device, image_size, server_name, server_port, s
             transparent_cams.change(model_from_scene_fun,
                                     inputs=[scene, min_conf_thr, as_pointcloud, transparent_cams, cam_size],
                                     outputs=outmodel)
-    demo.launch(share=False, server_name='127.0.0.1', server_port=args.server_port)
+    demo.launch(share=True, server_name='127.0.0.1', server_port=args.server_port)
 
 if __name__ == '__main__':
     parser = get_args_parser()

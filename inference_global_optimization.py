@@ -248,8 +248,8 @@ def get_reconstructed_scene(outdir, model, device, silent, image_size, filelist)
 
     pairs = make_pairs(imgs, scene_graph=scenegraph_type, prefilter=None, symmetrize=True)
     
-    t = [time.time()]
     torch.cuda.synchronize()
+    t = [time.time()]
     output = inference(pairs, model, device, batch_size=batch_size, verbose=not silent)
     torch.cuda.synchronize()
     t.append(time.time())
