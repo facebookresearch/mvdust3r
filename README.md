@@ -1,6 +1,6 @@
 <div align="center">
 <p align="center">
-  <h1>MV-DUSt3R+: Single-Stage Scene Reconstruction from Sparse Views In 2 Seconds</h1>
+  <h1>[CVPR 2025] MV-DUSt3R+: Single-Stage Scene Reconstruction from Sparse Views In 2 Seconds</h1>
   <a href="https://arxiv.org/abs/2412.06974">Paper</a> | <a href="https://mv-dust3rp.github.io/">Website</a> | <a href="https://www.youtube.com/watch?v=LBvnuKQ8Rso">Video</a> | <a href="https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/trajectories"> Data </a> | <a href="https://huggingface.co/Zhenggang/MV-DUSt3R/tree/main/checkpoints"> Checkpoints </a>
 </p>
 </div>
