@@ -15,7 +15,7 @@ h5py
 scikit-learn
 tensorflow
 gsplat==1.4.0
-torch==2.5.1
+torch==2.12.0
 torchmetrics[image]==1.6.0
 torchvision==0.20.1
 pillow>=11.0.0
