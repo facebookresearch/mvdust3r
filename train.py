@@ -89,7 +89,7 @@ def get_args_parser():
     parser.add_argument('--save_freq', default=1, type=int,
                         help='frequence (number of epochs) to save checkpoint in checkpoint-last.pth')
     parser.add_argument('--keep_freq', default=20, type=int,
-                        help='frequence (number of epochs) to save checkpoint in checkpoint-%d.pth')
+                        help='frequence (number of epochs) to save checkpoint in checkpoint-%%d.pth')
     parser.add_argument('--print_freq', default=20, type=int,
                         help='frequence (number of iterations) to print infos while training')
     parser.add_argument('--miter', default=0, type=int,

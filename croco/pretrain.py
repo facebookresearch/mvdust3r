@@ -60,7 +60,7 @@ def get_args_parser():
     parser.add_argument('--local_rank', default=-1, type=int)
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     parser.add_argument('--save_freq', default=1, type=int, help='frequence (number of epochs) to save checkpoint in checkpoint-last.pth')
-    parser.add_argument('--keep_freq', default=20, type=int, help='frequence (number of epochs) to save checkpoint in checkpoint-%d.pth')
+    parser.add_argument('--keep_freq', default=20, type=int, help='frequence (number of epochs) to save checkpoint in checkpoint-%%d.pth')
     parser.add_argument('--print_freq', default=20, type=int, help='frequence (number of iterations) to print infos while training')
     # paths 
     parser.add_argument('--output_dir', default='./output/', type=str, help="path where to save the output")
